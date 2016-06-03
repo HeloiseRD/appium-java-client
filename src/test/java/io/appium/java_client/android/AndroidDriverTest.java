@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.google.gson.JsonObject;
+
 import io.appium.java_client.AppiumSetting;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
