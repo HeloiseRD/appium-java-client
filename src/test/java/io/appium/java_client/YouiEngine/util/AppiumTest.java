@@ -1,15 +1,16 @@
 package io.appium.java_client.YouiEngine.util;
 
 import io.appium.java_client.YouiEngine.YouiEngineDriver;
+import io.appium.java_client.remote.AndroidMobileCapabilityType;
+import io.appium.java_client.remote.MobileCapabilityType;
+import io.appium.java_client.remote.YouiEngineCapabilityType;
 import org.apache.commons.logging.LogFactory;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -25,12 +26,24 @@ public class AppiumTest {
     static {
         // Disable annoying cookie warnings.
         // WARNING: Invalid cookie header
-        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log",
+                "org.apache.commons.logging.impl.NoOpLog");
     }
 
+    public static TestUtility utils;
     public static YouiEngineDriver driver;
     public static URL serverAddress;
+
+    public String iosAppPath;
+    public String androidAppPath;
+    public boolean isAndroid;
+
     private static WebDriverWait driverWait;
+    private DesiredCapabilities capabilities = new DesiredCapabilities();
+
+    /** Keep the same date prefix to identify job sets. **/
+    private static Date date = new Date();
+
 
     @Rule
     public TestRule printTests = new TestWatcher() {
@@ -54,46 +67,43 @@ public class AppiumTest {
     }
 
     /**
-     * Set implicit wait in seconds *
+     * Set implicit wait in seconds.
      */
     public static void setWait(int seconds) {
         driver.manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
     }
 
-    /** Keep the same date prefix to identify job sets. **/
-    private static Date date = new Date();
+    private void setupCaps(String appPath) {
+        capabilities.setCapability(MobileCapabilityType.APP, appPath);
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "YouiEngine");
+        capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
 
-    private DesiredCapabilities capabilities = new DesiredCapabilities();
-    private void setupCaps(Boolean isAndroid, String appPath) {
-        capabilities.setCapability("appium-version", "1.5.2");
-        capabilities.setCapability("app", appPath);
-        if (isAndroid){
-            capabilities.setCapability("platformName", "youi");
-            capabilities.setCapability("deviceName", "Android");
-            capabilities.setCapability("youiAppAddress", "localhost");
-            capabilities.setCapability("youiAppPlatform", "android");
-            capabilities.setCapability("avd", "nexus5intel");
-            capabilities.setCapability("platformVersion", "6.0.1");
+        if (isAndroid) {
+            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android");
+            capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "android");
+            capabilities.setCapability(AndroidMobileCapabilityType.AVD, "nexus5intel");
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "6.0.1");
         } else {
-            capabilities.setCapability("platformVersion", "9.3");
-            capabilities.setCapability("platformName", "youi");
-            capabilities.setCapability("youiAppAddress", "localhost");
-            capabilities.setCapability("youiAppPlatform", "iOS");
-            capabilities.setCapability("deviceName", "iPhone Simulator");
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "9.3");
+            capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "iOS");
+            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone Simulator");
         }
     }
 
-    /** Run before each test **/
+    /** Run before each test. **/
     @Before
     public void setUp() throws Exception {
-        /** Paths get parsed a little differently for iOS because it looks for Info.plist in other code. **/
-        String iOsPath = Paths.get(System.getProperty("user.dir"), "../../../uswish/samples/VideoPlayer/build/ios/Debug-iphonesimulator/VideoPlayer.app").toAbsolutePath().toString();
-        String iOsPath2 = Paths.get(System.getProperty("user.dir"), "../../../uswish/Test/apps/InputFieldTester/build/ios/Debug-iphonesimulator/InputFieldTester.app").toAbsolutePath().toString();
-        String androidAppPath = Paths.get(System.getProperty("user.dir"), "../../../uswish/samples/VideoPlayer/build/AndroidNative/bin/VideoPlayer-debug.apk").toAbsolutePath().toString();
+        /** Paths get parsed a little differently for iOS because it looks for Info.plist in other
+         * code. **/
+        String appName = "SimpleViews";
+        iosAppPath = Paths.get(System.getProperty("user.dir"), "java/io/appium/java_client/" +
+                appName + ".app").toAbsolutePath().toString();
+        androidAppPath = Paths.get(System.getProperty("user.dir"), "java/io/appium/java_client/" +
+                appName + "-debug.apk").toAbsolutePath().toString();
 
-        boolean isAndroid = false;
-        String myAppPath = isAndroid ? androidAppPath : iOsPath;
-        setupCaps(isAndroid, myAppPath);
+        isAndroid = false;
+        String myAppPath = isAndroid ? androidAppPath : iosAppPath;
+        setupCaps(myAppPath);
 
         URL serverAddress;
         serverAddress = new URL("http://127.0.0.1:4723/wd/hub");
@@ -103,10 +113,12 @@ public class AppiumTest {
         init(driver, serverAddress);
     }
 
-    /** Run after each test **/
+    /** Run after each test. **/
     @After
     public void tearDown() throws Exception {
-        if (driver != null) driver.quit();
+        if (driver != null) {
+            driver.quit();
+        }
     }
 
 }
