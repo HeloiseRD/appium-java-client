@@ -16,9 +16,19 @@ import org.openqa.selenium.remote.SessionId;
 
 import static org.hamcrest.CoreMatchers.not;
 
-
+/**
+ * This test class performs a simple series of tests to confirm our implementation in the
+ * YouiEngine driver and in this java_client. This test class uses the included
+ * YouiEngineAppiumSample app as a target for these tests. The intent of each test can be found
+ * before each of the test methods.
+ *
+ * <p>This test uses the model provided in the Appium java_client test tutorial.
+ *
+ * <p>Uncompress the iOS YouiEngineAppiumSample.app.zip before using this with iOS as a target.
+ */
 public class SanityTest extends AppiumTest {
 
+    // Confirm we can get the page source and it is not empty.
     @org.junit.Test
     public void pageSourceTest() throws Exception {
         String source;
@@ -28,6 +38,7 @@ public class SanityTest extends AppiumTest {
 
     }
 
+    // Confirm we can take a screenshot.
     @org.junit.Test
     public void screenshotTest() throws Exception {
         File screenShot = driver.getScreenshotAs(OutputType.FILE);
@@ -37,6 +48,7 @@ public class SanityTest extends AppiumTest {
         System.out.println("\nOutput: " + output.getAbsolutePath());
     }
 
+    // Confirm we can take a screenshot with a path supplied.
     @org.junit.Test
     public void screenshotWithPathTest() throws Exception {
         String fileWithPath = Paths.get(System.getProperty("user.home"))
@@ -49,6 +61,7 @@ public class SanityTest extends AppiumTest {
         System.out.println("\nOutput: " + output.getAbsolutePath());
     }
 
+    // Confirm we can find an element using the class name strategy.
     @org.junit.Test
     public void findElementByClassTest() throws Exception {
         WebElement posterItem = null;
@@ -61,6 +74,7 @@ public class SanityTest extends AppiumTest {
         Assert.assertNotNull(posterItem);
     }
 
+    // Confirm we can find an element using the name strategy.
     @org.junit.Test
     public void findElementByNameTest() throws Exception {
         WebElement posterList = null;
@@ -73,6 +87,7 @@ public class SanityTest extends AppiumTest {
         Assert.assertNotNull(posterList);
     }
 
+    // Confirm we throw a NoSuchElementException when the element was not found.
     @org.junit.Test
     public void findElementNotFoundTest() throws Exception {
         boolean exceptionThrown = false;
@@ -85,6 +100,7 @@ public class SanityTest extends AppiumTest {
         Assert.assertTrue(exceptionThrown);
     }
 
+    // Confirm we can find multiple elements using the class name strategy.
     @org.junit.Test
     public void findMultipleElementsTest() throws Exception {
         int expectedCount = 4;
@@ -95,6 +111,8 @@ public class SanityTest extends AppiumTest {
         Assert.assertEquals(atlasTextSceneViewList.size(), expectedCount);
     }
 
+    /* Confirm we can perform a relative find. The parent is found using the class name strategy
+     * and the child is found using the name strategy. */
     @org.junit.Test
     public void findSingleElementFromElementTest() throws Exception {
         WebElement buttonView = driver.findElement(By.className("CYITextEditView"));
@@ -105,6 +123,9 @@ public class SanityTest extends AppiumTest {
         Assert.assertEquals(expectedText, foundText);
     }
 
+    /* Confirm we can perform a relative find resulting in multiple elements. The parent is found
+     * using the class name strategy and its children are also found using the class name strategy.
+     * */
     @org.junit.Test
     public void findMultipleElementsFromElementTest() throws Exception {
         WebElement listContainer = driver.findElement(By.className("CYIScreenView"));
@@ -117,29 +138,31 @@ public class SanityTest extends AppiumTest {
         Assert.assertEquals(expectedCount, actualCount);
     }
 
+    // Confirm we get the text of a button.
     @org.junit.Test
     public void getTextTest() throws Exception {
-        WebElement textLabel = driver.findElement(By.className("CYIAtlasTextSceneNode"));
+        WebElement pushButton = driver.findElement(By.className("CYIPushButtonView"));
 
-        String foundText = textLabel.getText();
+        String foundText = pushButton.findElement(By.name("Text")).getText();
         String expectedText = "Pushed 0 Times";
         Assert.assertEquals(expectedText, foundText);
     }
 
+    // Confirm we can retrieve the name attribute of an input field.
     @org.junit.Test
     public void getNameTest() throws Exception {
         String expected = "TextEdit";
 
-        WebElement textCaption = driver.findElementByName(expected);
-        String actual = textCaption.getAttribute("name");
+        WebElement inputField = driver.findElementByName(expected);
+        String actual = inputField.getAttribute("name");
 
         Assert.assertEquals(expected, actual);
     }
 
+    // Confirm we can set the text of an input field.
     @org.junit.Test
     public void valueSetTest() throws Exception {
-        //String expected = "One Two 3";
-        String expected = "OneTwo3";
+        String expected = "One Two 3";
         WebElement field = driver.findElement(By.name("TextEdit"));
         field.sendKeys(expected);
         utils.delayInSeconds(2);
@@ -148,8 +171,9 @@ public class SanityTest extends AppiumTest {
         Assert.assertEquals(expected, found);
     }
 
-    //TODO create one with special keys
+    //TODO create one with special keys to validate we support special keys
 
+    // Confirm we can stop and then start up the app.
     @org.junit.Test
     public void startStopAppTest() throws Exception {
         driver.closeApp();
@@ -158,12 +182,14 @@ public class SanityTest extends AppiumTest {
         utils.delayInSeconds(5);
     }
 
+    // Confirm we can send the app to the background for a short time.
     @org.junit.Test
     public void runInBackgroundTest() throws Exception {
         driver.runAppInBackground(10);
         utils.delayInSeconds(3);
     }
 
+    // Confirm we can toggle the Android device's location services.
     @org.junit.Test
     public void toggleLocationServicesTest() throws Exception {
         try {
@@ -180,6 +206,7 @@ public class SanityTest extends AppiumTest {
         }
     }
 
+    // Confirm we can get the context.
     @org.junit.Test
     public void getContextTest() throws Exception {
         String contextValue = driver.getContext();
@@ -188,6 +215,8 @@ public class SanityTest extends AppiumTest {
         System.out.println("\nContext value: " + contextValue);
     }
 
+    /* Confirm we can get all contexts.
+     * NOTE: YouiEngine currently only supports one context. */
     @org.junit.Test
     public void getContextsTest() throws Exception {
         Set<String> contextValues = driver.getContextHandles();
@@ -196,6 +225,7 @@ public class SanityTest extends AppiumTest {
         System.out.println("\nContext values: " + contextValues);
     }
 
+    // Confirm we can get the session id.
     @org.junit.Test
     public void getSessionIdTest() throws Exception {
         SessionId sessionId = driver.getSessionId();
@@ -204,9 +234,11 @@ public class SanityTest extends AppiumTest {
         System.out.println("\nSession Id: " + sessionId);
     }
 
+    /* Confirm we can remove the app.
+     * NOTE: Only supported on Android and this will also shut down the driver. */
     @org.junit.Test
     public void removeAppTest() throws Exception {
-        String bundleId = "tv.youi.SimpleViews";
+        String bundleId = "tv.youi.YouiEngineAppiumSample";
 
         boolean actual = false;
         try {
@@ -224,9 +256,10 @@ public class SanityTest extends AppiumTest {
         Assert.assertEquals(expected, actual);
     }
 
+    // Confirm we can determine if an app is installed.
     @org.junit.Test
     public void isAppInstalledTest() throws Exception {
-        String bundleId = "tv.youi.SimpleViews";
+        String bundleId = "tv.youi.YouiEngineAppiumSample";
         boolean actual = false;
         try {
             actual = driver.isAppInstalled(bundleId);
@@ -242,6 +275,7 @@ public class SanityTest extends AppiumTest {
         Assert.assertEquals(expected, actual);
     }
 
+    // Regression - ensure no exceptions occur when sending a click to a CYIAtlasTextSceneNode.
     @org.junit.Test
     public void clickOnCyiTextAtlasTest() throws Exception {
         WebElement textLabel = driver.findElement(By.className("CYIAtlasTextSceneNode"));
@@ -253,93 +287,38 @@ public class SanityTest extends AppiumTest {
         }
     }
 
-    //TODO this does not appear to be implemented in the appium-ios-driver
+    //TODO the following tests need more testing or actual implementation in the YouiEngine driver
     /* @org.junit.Test
     public void installAppTest() throws Exception {
-        String appName = "VideoPlayer";
-        String androidAppPath = Paths.get(System.getProperty("user.dir"),
-                "../../../../uswish/samples/" + appName + "/build/AndroidNative/bin/" + appName
-                        + "-debug.apk").toAbsolutePath().toString();
-        driver.installApp(androidAppPath);
     } */
 
-    // TODO needs to be right...
     /* @org.junit.Test
     public void isLockedTest() throws Exception {
-        boolean locked;
-        try {
-            driver.isLocked();
-        } catch (NoSuchMethodException nsmException) {
-            if (!driver.appPlatform.equals(driver.IOS)) {
-                Assert.fail("NoSuchMethodException was thrown when not on iOS.");
-            } else {
-                System.out.println("Expected exception was thrown.");
-            }
-        }
     } */
 
-    // TODO fix to take a string map for the args
-    /* @org.junit.Test
-    public void keysTest() throws Exception {
-        driver.execute("keys"); // does not appear to exist?
-    } */
-
-    // TODO update to reflect this was not implemented
-    /* @org.junit.Test
-    public void findElementByCssSelectorTest() throws Exception {
-        WebElement posterList = null;
-        try {
-            posterList = driver.findElement(By.cssSelector("???"));
-        } catch (NoSuchElementException exception) {
-            Assert.fail("Did not find the control.");
-        }
-
-        Assert.assertNotNull(posterList);
-    } */
-
-    //TODO not reliable to use ID while we're dynamically assigning them
     /* @org.junit.Test
     public void findElementByIdTest() throws Exception {
-        WebElement posterList = null;
-        try {
-            posterList = driver.findElement(By.id("0"));
-        } catch (NoSuchElementException exception) {
-            Assert.fail("Did not find the control.");
-        }
-
-        Assert.assertNotNull(posterList);
     } */
 
-    // TODO update this to reflect the correct error
+    // TODO update these to reflect the correct error
     /* @org.junit.Test
     public void findElementByXPathTest() throws Exception {
-        utils.delayInSeconds(15);
+    } */
 
-        WebElement sceneView = null;
-        try {
-            sceneView = driver.findElement(By.xpath("./AppiumUAT/CYISceneView"));
-        } catch (NoSuchElementException exception) {
-            Assert.fail("Did not find the control.");
-        }
-
-        Assert.assertNotNull(sceneView);
-
-        utils.delayInSeconds(3);
+    /* @org.junit.Test
+    public void findElementByCssSelectorTest() throws Exception {
     } */
 
     /* @org.junit.Test
     public void findElementByTagNameTest() throws Exception {
-        WebElement posterItem = null;
-        try {
-            posterItem = driver.findElement(By.tagName("LanderItemView"));
-        }
-        catch (NoSuchElementException exception)
-        {
-            Assert.fail("Did not find the control.");
-        }
-
-        Assert.assertNotNull(posterItem);
     } */
 
+    /* @org.junit.Test
+    public void findElementByLinkTextTest() throws Exception {
+    } */
+
+    /* @org.junit.Test
+    public void findElementByPartialLinkTextTest() throws Exception {
+    } */
 }
 
