@@ -29,9 +29,6 @@ public class YouiEngineDriver<T extends WebElement> extends AppiumDriver<T> {
         if (desiredCapabilities.getCapability(YouiEngineCapabilityType.APP_PLATFORM) != null) {
             appPlatform = desiredCapabilities.getCapability(YouiEngineCapabilityType.APP_PLATFORM)
                     .toString().toLowerCase();
-        } else {
-            // TODO what do we do if the appPlatform is null? I know Simon does this sometimes to
-            // allow connection to an existing app running...
         }
 
         // potential error/assert messages
@@ -62,15 +59,6 @@ public class YouiEngineDriver<T extends WebElement> extends AppiumDriver<T> {
         }
     }
 
-    // TODO: need to decide on how to communicate to the test author when something is not
-    // implemented for that platform
-    /*
-        The issue here seems to be that the capabilities of Android's native automation framework
-        differs from iOS's native automation framework. They both expose things differently or some
-        things only on one framework.
-     */
-
-    // --------- iOS ONLY ------------------------------------------------------------------------
     /** Requests the device emit a shake action.
      * Only available on iOS. */
     public void mobileShake() throws NoSuchMethodException {
@@ -81,7 +69,6 @@ public class YouiEngineDriver<T extends WebElement> extends AppiumDriver<T> {
     }
 
 
-    // --------- Android ONLY --------------------------------------------------------------------
     /** Requests toggling the Location Service setting.
      * Only available on Android. */
     public void toggleLocationServices() throws NoSuchMethodException {
@@ -146,7 +133,5 @@ public class YouiEngineDriver<T extends WebElement> extends AppiumDriver<T> {
         System.out.println(response);
         return true;
     }
-
-    // TODO might be worth adding a private method to determine if something is in a supported list.
 }
 

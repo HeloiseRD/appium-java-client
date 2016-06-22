@@ -5,6 +5,10 @@ import org.openqa.selenium.WebElement;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * This TestUtility is available to help test authors by wrapping common helper methods into a
+ * single class which can be instantiated in their test classes.
+ */
 public class TestUtility {
     /** Causes a delay in the provided number of seconds on the calling thread. */
     public static void delayInSeconds(long delay) throws InterruptedException {

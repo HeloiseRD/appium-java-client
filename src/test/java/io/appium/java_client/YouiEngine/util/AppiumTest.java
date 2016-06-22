@@ -21,6 +21,12 @@ import java.util.concurrent.TimeUnit;
 
 
 @SuppressWarnings("ALL")
+/**
+ * This is a utility class to contain settings for a test class and prepare the test session.
+ * Extend this to create a new test class.
+ *
+ * This follows the pattern found in the tutorial for writing Appium java_client tests.
+ */
 public class AppiumTest {
 
     static {
@@ -93,15 +99,17 @@ public class AppiumTest {
     /** Run before each test. **/
     @Before
     public void setUp() throws Exception {
-        /** Paths get parsed a little differently for iOS because it looks for Info.plist in other
-         * code. **/
-        String appName = "SimpleViews";
-        iosAppPath = Paths.get(System.getProperty("user.dir"), "java/io/appium/java_client/" +
-                appName + ".app").toAbsolutePath().toString();
-        androidAppPath = Paths.get(System.getProperty("user.dir"), "java/io/appium/java_client/" +
-                appName + "-debug.apk").toAbsolutePath().toString();
 
         isAndroid = false;
+
+        String currentPath = System.getProperty("user.dir");
+        String javaClientPath = "java/io/appium/java_client/";
+        String appName = "YouiEngineAppiumSample";
+        String fullAppName = isAndroid ? appName + "-debug.apk" : appName + ".app";
+        iosAppPath = Paths.get(currentPath, javaClientPath + fullAppName).toAbsolutePath()
+                .toString();
+        androidAppPath = Paths.get(currentPath, javaClientPath + fullAppName).toAbsolutePath()
+                .toString();
         String myAppPath = isAndroid ? androidAppPath : iosAppPath;
         setupCaps(myAppPath);
 
