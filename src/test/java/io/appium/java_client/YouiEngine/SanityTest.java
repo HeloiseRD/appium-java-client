@@ -238,19 +238,13 @@ public class SanityTest extends AppiumTest {
      * NOTE: Only supported on Android and this will also shut down the driver. */
     @org.junit.Test
     public void removeAppTest() throws Exception {
-        String bundleId = "tv.youi.YouiEngineAppiumSample";
 
         boolean actual = false;
         try {
             driver.removeApp(bundleId);
             actual = true; // did not throw exception
         } catch (WebDriverException wdException) {
-            if (!driver.appPlatform.equals(driver.IOS)) {
-                Assert.fail("WebDriverException was thrown when not on iOS.");
-            } else {
-                System.out.println("\nExpected exception was thrown.");
-                actual = true;
-            }
+                Assert.fail("WebDriverException was thrown.");
         }
         boolean expected = true;
         Assert.assertEquals(expected, actual);
@@ -259,7 +253,6 @@ public class SanityTest extends AppiumTest {
     // Confirm we can determine if an app is installed.
     @org.junit.Test
     public void isAppInstalledTest() throws Exception {
-        String bundleId = "tv.youi.YouiEngineAppiumSample";
         boolean actual = false;
         try {
             actual = driver.isAppInstalled(bundleId);
