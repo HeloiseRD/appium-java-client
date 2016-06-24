@@ -41,8 +41,7 @@ public class AppiumTest {
     public static YouiEngineDriver driver;
     public static URL serverAddress;
 
-    public String iosAppPath;
-    public String androidAppPath;
+    public String appPath;
     public boolean isAndroid;
     public String bundleId;
 
@@ -84,20 +83,29 @@ public class AppiumTest {
     private void setupCaps(String appPath) {
         capabilities.setCapability(MobileCapabilityType.APP, appPath);
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "YouiEngine");
+        capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, "0");
 
         if (isAndroid) {
             bundleId = "tv.youi.youiengine.youiengineappiumsample";
-            capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "192.168.24.149");
             capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, bundleId);
-            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "");
             capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "android");
-            //capabilities.setCapability(AndroidMobileCapabilityType.AVD, "nexus5intel");
+
+            // The lines below can be modified to target a device or an AVD. Update accordingly.
+            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android");
+            //capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "devicename");
+            capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
+            //capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "ip.add.res.ss");
+            capabilities.setCapability(AndroidMobileCapabilityType.AVD, "nexus5intel");
         } else {
             bundleId = "tv.youi.YouiEngineAppiumSample";
-            capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
             capabilities.setCapability(IOSMobileCapabilityType.BUNDLE_ID, bundleId);
             capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "iOS");
+
+            // Modify the lines below to change to an actual device or use a different simulator.
             capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone Simulator");
+            //capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "devicename");
+            capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
+            //capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "ip.add.res.ss");
         }
     }
 
@@ -108,15 +116,17 @@ public class AppiumTest {
         isAndroid = false;
 
         String currentPath = System.getProperty("user.dir");
-        String javaClientPath = "src/test/java/io/appium/java_client/";
+        //String javaClientPath = "src/test/java/io/appium/java_client/";
+        String javaClientPath = "java/io/appium/java_client/";
+
         String appName = "YouiEngineAppiumSample";
         String fullAppName = isAndroid ? appName + "-debug.apk" : appName + ".app.zip";
-        iosAppPath = Paths.get(currentPath, javaClientPath + fullAppName).toAbsolutePath()
+        String iosAppPath = Paths.get(currentPath, javaClientPath + fullAppName).toAbsolutePath()
                 .toString();
-        androidAppPath = Paths.get(currentPath, javaClientPath + fullAppName).toAbsolutePath()
-                .toString();
-        String myAppPath = isAndroid ? androidAppPath : iosAppPath;
-        setupCaps(myAppPath);
+        String androidAppPath = Paths.get(currentPath, javaClientPath + fullAppName)
+                .toAbsolutePath().toString();
+        appPath = isAndroid ? androidAppPath : iosAppPath;
+        setupCaps(appPath);
 
         URL serverAddress;
         serverAddress = new URL("http://127.0.0.1:4723/wd/hub");
