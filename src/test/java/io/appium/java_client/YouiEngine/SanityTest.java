@@ -5,6 +5,7 @@ import io.appium.java_client.YouiEngine.util.AppiumTest;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -12,7 +13,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
 import org.openqa.selenium.*;
+import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 
 import static org.hamcrest.CoreMatchers.not;
 
@@ -177,26 +180,88 @@ public class SanityTest extends AppiumTest {
     @org.junit.Test
     public void startStopAppTest() throws Exception {
         driver.closeApp();
-        utils.delayInSeconds(5);
+        utils.delayInSeconds(2);
         driver.launchApp();
-        utils.delayInSeconds(5);
+        utils.delayInSeconds(2);
     }
 
+    // TODO US-3491 - backgrounding our app closes the socket server
     // Confirm we can send the app to the background for a short time.
     @org.junit.Test
     public void runInBackgroundTest() throws Exception {
         driver.runAppInBackground(10);
-        utils.delayInSeconds(3);
+        try {
+            WebElement pushButton = driver.findElement(By.name("PushButton"));
+            pushButton.click();
+        } catch (Exception ex) {
+            Assert.fail("Failed to find or interact with the button after backgrounding the app. "
+                    + "May not have restored properly.");
+        }
     }
+    //
 
     // Confirm we can toggle the Android device's location services.
     @org.junit.Test
     public void toggleLocationServicesTest() throws Exception {
         try {
             driver.toggleLocationServices(); // off
-            utils.delayInSeconds(5);
+            utils.delayInSeconds(2);
             driver.toggleLocationServices(); // on
-            utils.delayInSeconds(5);
+            utils.delayInSeconds(2);
+        } catch (NoSuchMethodException nsmException) {
+            if (!driver.appPlatform.equals(driver.IOS)) {
+                Assert.fail("NoSuchMethodException was thrown when not on iOS.");
+            } else {
+                System.out.println("\nExpected exception was thrown.");
+            }
+        } catch (UnreachableBrowserException ubException) {
+            Assert.fail("UnreachableBrowserException was thrown. Method may not work for the "
+                    + "supplied device.");
+        }
+    }
+
+    // Confirm we can toggle the Android device's wifi setting.
+    @org.junit.Test
+    public void toggleWifiTest() throws Exception {
+        try {
+            driver.toggleWiFi(); // off
+            utils.delayInSeconds(2);
+            driver.toggleWiFi(); // on
+            utils.delayInSeconds(2);
+        } catch (NoSuchMethodException nsmException) {
+            if (!driver.appPlatform.equals(driver.IOS)) {
+                Assert.fail("NoSuchMethodException was thrown when not on iOS.");
+            } else {
+                System.out.println("\nExpected exception was thrown.");
+            }
+        }
+    }
+
+    // Confirm we can toggle the Android device's data setting.
+    @org.junit.Test
+    public void toggleDataTest() throws Exception {
+        try {
+            driver.toggleData(); // off
+            utils.delayInSeconds(2);
+            driver.toggleData(); // on
+            utils.delayInSeconds(2);
+        } catch (NoSuchMethodException nsmException) {
+            if (!driver.appPlatform.equals(driver.IOS)) {
+                Assert.fail("NoSuchMethodException was thrown when not on iOS.");
+            } else {
+                System.out.println("\nExpected exception was thrown.");
+            }
+        }
+    }
+
+    // Confirm we can toggle the Android device's flight mode setting.
+    @org.junit.Test
+    public void toggleFlightModeTest() throws Exception {
+        try {
+            driver.toggleFlightMode(); // off
+            utils.delayInSeconds(2);
+            driver.toggleFlightMode(); // on
+            utils.delayInSeconds(2);
         } catch (NoSuchMethodException nsmException) {
             if (!driver.appPlatform.equals(driver.IOS)) {
                 Assert.fail("NoSuchMethodException was thrown when not on iOS.");
@@ -238,13 +303,30 @@ public class SanityTest extends AppiumTest {
      * NOTE: Only supported on Android and this will also shut down the driver. */
     @org.junit.Test
     public void removeAppTest() throws Exception {
-
         boolean actual = false;
         try {
             driver.removeApp(bundleId);
             actual = true; // did not throw exception
         } catch (WebDriverException wdException) {
-                Assert.fail("WebDriverException was thrown.");
+            Assert.fail("WebDriverException was thrown.");
+        }
+        boolean expected = true;
+        Assert.assertEquals(expected, actual);
+    }
+
+    /* Confirm we can remove the app.
+     * NOTE: Only supported on Android and this will also shut down the driver. */
+    @org.junit.Test
+    public void installAppTest() throws Exception {
+        boolean actual = false;
+        try {
+            driver.removeApp(bundleId);
+            utils.delayInSeconds(5);
+            driver.installApp(appPath);
+            utils.delayInSeconds(5);
+            actual = driver.isAppInstalled(bundleId);
+        } catch (WebDriverException wdException) {
+            Assert.fail("WebDriverException was thrown.");
         }
         boolean expected = true;
         Assert.assertEquals(expected, actual);
@@ -268,6 +350,183 @@ public class SanityTest extends AppiumTest {
         Assert.assertEquals(expected, actual);
     }
 
+    /* Performs a device level orientation change and confirms we can retrieve the expected
+    * orientation. */
+    @org.junit.Test
+    public void verifyOrientationChangesTest() throws Exception {
+        ScreenOrientation currentOrientation = driver.getOrientation();
+
+        // Check that the default orientation for this app was Portrait.
+        if (currentOrientation == ScreenOrientation.PORTRAIT) {
+            System.out.println("\nOrientation was Portrait.");
+        } else {
+            Assert.fail("\nOrientation was not Portrait.");
+        }
+
+        // Switch the orientation to Landscape
+        driver.rotate(ScreenOrientation.LANDSCAPE);
+        utils.delayInSeconds(2);
+
+        currentOrientation =  driver.getOrientation();
+        if (currentOrientation == ScreenOrientation.LANDSCAPE) {
+            System.out.println("\nOrientation was Landscape.");
+        } else {
+            Assert.fail("\nOrientation was not Landscape.");
+        }
+
+        // Switch back to Portrait
+        driver.rotate(ScreenOrientation.PORTRAIT);
+        utils.delayInSeconds(2);
+
+        currentOrientation =  driver.getOrientation();
+        if (currentOrientation == ScreenOrientation.PORTRAIT) {
+            System.out.println("\nOrientation was Portrait.");
+        } else {
+            Assert.fail("\nOrientation was not Portrait.");
+        }
+    }
+
+    // Call the get app string and ensure we get something back.
+    @org.junit.Test
+    public void getStringsTest() throws Exception {
+        Map appStringMap = driver.getAppStringMap();
+        Assert.assertNotNull(appStringMap);
+        System.out.println("\nMap: " + appStringMap.toString());
+    }
+
+    // TODO These overloads do not currently apply to You.i Engine applications.
+    // getAppStringMap(language)
+    // getAppStringMap(language, stringFile)
+
+    // Confirm the resetApp call works.
+    @org.junit.Test
+    public void resetTest() throws Exception {
+        try {
+            driver.resetApp();
+        } catch (Exception ex ) {
+            Assert.fail("\nException was thrown when trying to reset the app.");
+        }
+    }
+
+    // Confirm the getLogTypes call works.
+    @org.junit.Test
+    public void getLogTypesTest() throws Exception {
+        Set<String> logTypes = driver.getLogTypes();
+        Assert.assertNotNull(logTypes);
+        System.out.println("\nLog Types: " + logTypes);
+    }
+
+    // Confirm the getLogs call works with LOG_SYSTEM.
+    @org.junit.Test
+    public void getSysLogTest() throws Exception {
+        if (driver.appPlatform.equals(driver.ANDROID)) {
+            System.out.println("Not a supported Log Type for Android.");
+            return;
+        }
+        LogEntries logs = driver.getLogs(driver.LOG_SYSTEM);
+        Assert.assertNotNull(logs);
+        System.out.println("\nLogs: " + logs.toString());
+    }
+
+    // Confirm the getLogs call works with LOG_CRASH.
+    @org.junit.Test
+    public void getCrashLogTest() throws Exception {
+        if (driver.appPlatform.equals(driver.ANDROID)) {
+            System.out.println("Not a supported Log Type for Android.");
+            return;
+        }
+        LogEntries logs = driver.getLogs(driver.LOG_CRASH);
+        Assert.assertNotNull(logs);
+        System.out.println("\nLogs: " + logs.toString());
+    }
+
+    // Confirm the getLogs call works with LOG_CLIENT.
+    @org.junit.Test
+    public void getClientLogTest() throws Exception {
+        LogEntries logs = driver.getLogs(driver.LOG_CLIENT);
+        Assert.assertNotNull(logs);
+        System.out.println("\nLogs: " + logs.toString());
+    }
+
+    // Confirm the getLogs call works with LOG_LOGCAT.
+    @org.junit.Test
+    public void getLogCatLogTest() throws Exception {
+        if (driver.appPlatform.equals(driver.IOS)) {
+            System.out.println("Not a supported Log Type for iOS.");
+            return;
+        }
+        LogEntries logs = driver.getLogs(driver.LOG_LOGCAT);
+        Assert.assertNotNull(logs);
+        System.out.println("\nLogs: " + logs.toString());
+    }
+
+
+    /* Disabled lock/unlock tests - Android implementation doesn't think it unlocks correctly.
+    // Confirm the lockFor call works. NOTE: Only works with swipe to unlock.
+    @org.junit.Test
+    public void lockForTest() throws Exception {
+        driver.lockFor(5);
+        utils.delayInSeconds(2);
+        try {
+            WebElement pushButton = driver.findElement(By.name("PushButton"));
+            pushButton.click();
+        } catch (Exception ex) {
+            Assert.fail("Failed to find or interact with the button after unlocking. May not have"
+                    + " unlocked properly.");
+        }
+    }
+
+    // Confirm the lock call works. NOTE: Only works with swipe to unlock.
+    @org.junit.Test
+    public void lockTest() throws Exception {
+        if (driver.appPlatform.equals(driver.IOS)) {
+            System.out.println("lock() is covered by the lockFor() test for iOS.");
+            return;
+        }
+        driver.lock();
+    }
+
+    // Confirm the isLocked call works.
+    @org.junit.Test
+    public void isLockedTest() throws Exception {
+        if (driver.appPlatform.equals(driver.IOS)) {
+            System.out.println("isLocked() is not supported for iOS.");
+            return;
+        }
+        driver.lock();
+        utils.delayInSeconds(2);
+        boolean actual = driver.isLocked();
+        Assert.assertTrue(actual);
+    }
+
+    // Confirm the Unlock call works. NOTE: Only works with swipe to unlock.
+    @org.junit.Test
+    public void unlockTest() throws Exception {
+        if (driver.appPlatform.equals(driver.IOS)) {
+            System.out.println("Unlock() is not supported for iOS.");
+            return;
+        }
+        driver.lock();
+        utils.delayInSeconds(2);
+        driver.unlock();
+        utils.delayInSeconds(2);
+        boolean actual = driver.isLocked();
+        Assert.assertFalse(actual);
+    }
+    */
+
+    /*
+    // Confirm the mobileShake call works.
+    @org.junit.Test
+    public void mobileShakeTest() throws Exception {
+        if (driver.appPlatform.equals(driver.ANDROID)) {
+            System.out.println("mobileShake() is not supported for Android.");
+            return;
+        }
+        driver.mobileShake();
+    } */
+
+
     // Regression - ensure no exceptions occur when sending a click to a CYIAtlasTextSceneNode.
     @org.junit.Test
     public void clickOnCyiTextAtlasTest() throws Exception {
@@ -280,17 +539,50 @@ public class SanityTest extends AppiumTest {
         }
     }
 
-    //TODO the following tests need more testing or actual implementation in the YouiEngine driver
-    /* @org.junit.Test
-    public void installAppTest() throws Exception {
-    } */
 
+    /* TODO coming soon....
+    @org.junit.Test
+    public void isSelectedTest() throws Exception {
+        WebElement toggleButton = driver.findElement(By.className("CYIToggleButton"));
+
+        // Initial state should be 'off'.
+        Assert.assertFalse(toggleButton.isSelected());
+
+        // Toggle this to on and check again.
+        toggleButton.click();
+        Assert.assertTrue(toggleButton.isSelected());
+
+        // Toggle this back off and confirm it is off.
+        toggleButton.click();
+        Assert.assertFalse(toggleButton.isSelected());
+    }
+
+    @org.junit.Test
+    public void isEnabledTest() throws Exception {
+        boolean inputEnabled = driver.findElement(By.name("TextEdit")).isEnabled();
+        boolean passwordEnabled = driver.findElement(By.name("PasswordEdit")).isEnabled();
+        boolean buttonEnabled = driver.findElement(By.name("PushButton")).isEnabled();
+        boolean toggleEnabled = driver.findElement(By.name("ToggleButton")).isEnabled();
+
+        // TODO need a test for a false return - finish and report
+    }
+    */
+
+    // TODO the following tests need more testing or actual implementation in the YouiEngine driver
     /* @org.junit.Test
     public void isLockedTest() throws Exception {
     } */
 
     /* @org.junit.Test
     public void findElementByIdTest() throws Exception {
+    } */
+
+    // Confirm the getLogs call works with LOG_PERFORMANCE.
+    /* @org.junit.Test
+    public void getPerformanceLogTest() throws Exception {
+        LogEntries logs = driver.getLogs(driver.LOG_PERFORMANCE);
+        Assert.assertNotNull(logs);
+        System.out.println("\nLogs: " + logs.toString());
     } */
 
     // TODO update these to reflect the correct error

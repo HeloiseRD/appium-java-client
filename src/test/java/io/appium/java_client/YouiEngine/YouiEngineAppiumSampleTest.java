@@ -14,7 +14,6 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -86,17 +85,20 @@ public class YouiEngineAppiumSampleTest {
 
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "YouiEngine");
         capabilities.setCapability(MobileCapabilityType.APP, appPath);
-        capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
 
         if (isAndroid) {
-            capabilities.setCapability(AndroidMobileCapabilityType.AVD, "nexus5intel");
-            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android");
-            capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "6.0");
             capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "android");
+            // The lines below can be modified to target a device or an AVD. Update accordingly.
+            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android");
+            //capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "devicename");
+            capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
+            //capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "ip.add.res.ss");
+            capabilities.setCapability(AndroidMobileCapabilityType.AVD, "nexus5intel");
+
         } else {
-            capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "9.3");
-            capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "iOS");
             capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 6s Plus");
+            capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
+            capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "iOS");
         }
     }
 
@@ -115,12 +117,12 @@ public class YouiEngineAppiumSampleTest {
     @Before
     public void setUp() throws Exception {
         // Toggle this to switch between Android and iOS
-        isAndroid = false;
+        isAndroid = true;
 
         String currentPath = System.getProperty("user.dir");
         String javaClientPath = "java/io/appium/java_client/";
         String appName = "YouiEngineAppiumSample";
-        String fullAppName = isAndroid ? appName + "-debug.apk" : appName + ".app";
+        String fullAppName = isAndroid ? appName + "-debug.apk" : appName + ".app.zip";
 
         String iosAppPath = Paths.get(currentPath, javaClientPath + fullAppName).toAbsolutePath()
                 .toString();
@@ -267,42 +269,4 @@ public class YouiEngineAppiumSampleTest {
         }
         Assert.assertTrue(allFound);
     }
-
-    /* Performs a device level orientation change and confirms we can retrieve the expected
-     * orientation.
-     *  */
-    @org.junit.Test
-    public void verifyOrientationChangesTest() throws Exception {
-        ScreenOrientation currentOrientation = driver.getOrientation();
-
-        // Check that the default orientation for this app was Portrait.
-        if (currentOrientation == ScreenOrientation.PORTRAIT) {
-            System.out.println("\nOrientation was Portrait.");
-        } else {
-            Assert.fail("\nOrientation was not Portrait.");
-        }
-
-        // Switch the orientation to Landscape
-        driver.rotate(ScreenOrientation.LANDSCAPE);
-        utils.delayInSeconds(3);
-
-        currentOrientation =  driver.getOrientation();
-        if (currentOrientation == ScreenOrientation.LANDSCAPE) {
-            System.out.println("\nOrientation was Landscape.");
-        } else {
-            Assert.fail("\nOrientation was not Landscape.");
-        }
-
-        // Switch back to Portrait
-        driver.rotate(ScreenOrientation.PORTRAIT);
-        utils.delayInSeconds(3);
-
-        currentOrientation =  driver.getOrientation();
-        if (currentOrientation == ScreenOrientation.PORTRAIT) {
-            System.out.println("\nOrientation was Portrait.");
-        } else {
-            Assert.fail("\nOrientation was not Portrait.");
-        }
-    }
-
 }
