@@ -1,17 +1,14 @@
 package io.appium.java_client.YouiEngine;
 
-import com.sun.tools.javac.util.Assert;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.YouiEngine.internal.JsonToYouiEngineElementConverter;
-import io.appium.java_client.remote.YouiEngineCapabilityType;
-import org.openqa.selenium.By;
+import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.remote.Response;
 
 import java.net.URL;
-import java.util.List;
 import java.util.Set;
 
 
@@ -28,16 +25,14 @@ public class YouiEngineDriver<T extends WebElement> extends AppiumDriver<T> {
     public String appPlatform;
 
     private String unsupportedMethodForPlatform;
-    private String unsupportedMethodForYouiEngine;
-    private String unknownPlatformSpecified;
 
     /** Constructor takes in the Appium Server URL and the capabilities you want to use for this
      * test execution. **/
     public YouiEngineDriver(URL remoteAddress, Capabilities desiredCapabilities) {
         super(remoteAddress, desiredCapabilities, JsonToYouiEngineElementConverter.class);
 
-        if (desiredCapabilities.getCapability(YouiEngineCapabilityType.APP_PLATFORM) != null) {
-            appPlatform = desiredCapabilities.getCapability(YouiEngineCapabilityType.APP_PLATFORM)
+        if (desiredCapabilities.getCapability(MobileCapabilityType.PLATFORM) != null) {
+            appPlatform = desiredCapabilities.getCapability(MobileCapabilityType.PLATFORM)
                     .toString().toLowerCase();
         }
 
@@ -47,86 +42,11 @@ public class YouiEngineDriver<T extends WebElement> extends AppiumDriver<T> {
 
     private void initializeErrorStrings() {
         unsupportedMethodForPlatform = "Unsupported method for platform: " + appPlatform;
-        unsupportedMethodForYouiEngine = "This method is currently unsupported for You.i Engine "
-                + "platform.";
-        unknownPlatformSpecified = "Unknown app platform provided: " + appPlatform;
     }
 
     @Override
     public void swipe(int startx, int starty, int endx, int endy, int duration) {
         super.doSwipe(startx, starty, endx, endy, duration); // pass this down?
-    }
-
-
-    @Override
-    public List<T> findElementsByAccessibilityId(String using) {
-        Assert.error(unsupportedMethodForYouiEngine);
-        return null;
-    }
-
-    @Override
-    public List<T> findElementsByCssSelector(String using) {
-        Assert.error(unsupportedMethodForYouiEngine);
-        return null;
-    }
-
-    @Override
-    public List<T> findElementsByLinkText(String using) {
-        Assert.error(unsupportedMethodForYouiEngine);
-        return null;
-    }
-
-    @Override
-    public List<T> findElementsByPartialLinkText(String using) {
-        Assert.error(unsupportedMethodForYouiEngine);
-        return null;
-    }
-
-    @Override
-    public List<T> findElementsByXPath(String using) {
-        Assert.error(unsupportedMethodForYouiEngine);
-        return null;
-    }
-
-    @Override
-    public List<T> findElementsByTagName(String using) {
-        // You.i Engine maps the className to the tagName so we will redirect this call to that one.
-        return super.findElementsByClassName(using);
-    }
-
-    @Override
-    public T findElementByAccessibilityId(String using) {
-        Assert.error(unsupportedMethodForYouiEngine);
-        return null;
-    }
-
-    @Override
-    public T findElementByCssSelector(String using) {
-        Assert.error(unsupportedMethodForYouiEngine);
-        return null;
-    }
-
-    @Override
-    public T findElementByLinkText(String using) {
-        Assert.error(unsupportedMethodForYouiEngine);
-        return null;
-    }
-
-    @Override
-    public T findElementByPartialLinkText(String using) {
-        Assert.error(unsupportedMethodForYouiEngine);
-        return null;
-    }
-
-    @Override
-    public T findElementByXPath(String using) {
-        Assert.error(unsupportedMethodForYouiEngine);
-        return null;
-    }
-
-    @Override
-    public T findElementByTagName(String using) {
-        return this.findElementByClassName(using);
     }
 
     /** Returns a collection of available log types. **/
@@ -157,13 +77,11 @@ public class YouiEngineDriver<T extends WebElement> extends AppiumDriver<T> {
     /** Requests the device emit a shake action.
      * Only available on iOS. */
     public void mobileShake() throws NoSuchMethodException {
-        /* if (!appPlatform.equals(IOS)) {
+        if (!appPlatform.equals(IOS)) {
             throw new NoSuchMethodException(unsupportedMethodForPlatform);
         }
-        this.execute("mobileShake"); */
-        throw new NoSuchMethodException(unsupportedMethodForYouiEngine);
+        this.execute("mobileShake");
     }
-
 
     /** Requests toggling the Location Service setting.
      * Only available on Android. */
@@ -177,31 +95,28 @@ public class YouiEngineDriver<T extends WebElement> extends AppiumDriver<T> {
     /** Requests toggling the device's Flight Mode setting.
      * Only available on Android. */
     public void toggleFlightMode() throws NoSuchMethodException {
-        /* if (!appPlatform.equals(ANDROID)) {
+        if (!appPlatform.equals(ANDROID)) {
             throw new NoSuchMethodException(unsupportedMethodForPlatform);
         }
-        super.execute("toggleFlightMode"); */
-        throw new NoSuchMethodException(unsupportedMethodForYouiEngine);
+        super.execute("toggleFlightMode");
     }
 
     /** Requests toggling the device's WiFi setting.
      * Only available on Android. */
     public void toggleWiFi() throws NoSuchMethodException {
-        /* if (!appPlatform.equals(ANDROID)) {
+        if (!appPlatform.equals(ANDROID)) {
             throw new NoSuchMethodException(unsupportedMethodForPlatform);
         }
-        super.execute("toggleWiFi"); */
-        throw new NoSuchMethodException(unsupportedMethodForYouiEngine);
+        super.execute("toggleWiFi");
     }
 
     /** Requests toggling the device's Data setting.
      * Only available on Android. */
     public void toggleData() throws NoSuchMethodException {
-        /* if (!appPlatform.equals(ANDROID)) {
+        if (!appPlatform.equals(ANDROID)) {
             throw new NoSuchMethodException(unsupportedMethodForPlatform);
         }
-        super.execute("toggleData"); */
-        throw new NoSuchMethodException(unsupportedMethodForYouiEngine);
+        super.execute("toggleData");
     }
 
     /** Requests that the device locks itself.

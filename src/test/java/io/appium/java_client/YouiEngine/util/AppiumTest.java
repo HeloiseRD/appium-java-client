@@ -82,13 +82,13 @@ public class AppiumTest {
 
     private void setupCaps(String appPath) {
         capabilities.setCapability(MobileCapabilityType.APP, appPath);
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "YouiEngine");
+        capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "YouiEngine");
         capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, "0");
 
         if (isAndroid) {
             bundleId = "tv.youi.youiengine.youiengineappiumsample";
             capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, bundleId);
-            capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "android");
+            capabilities.setCapability(MobileCapabilityType.PLATFORM, "android");
 
             // The lines below can be modified to target a device or an AVD. Update accordingly.
             capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android");
@@ -99,7 +99,7 @@ public class AppiumTest {
         } else {
             bundleId = "tv.youi.YouiEngineAppiumSample";
             capabilities.setCapability(IOSMobileCapabilityType.BUNDLE_ID, bundleId);
-            capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "iOS");
+            capabilities.setCapability(MobileCapabilityType.PLATFORM, "iOS");
 
             // Modify the lines below to change to an actual device or use a different simulator.
             capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone Simulator");
@@ -113,7 +113,7 @@ public class AppiumTest {
     @Before
     public void setUp() throws Exception {
 
-        isAndroid = false;
+        isAndroid = true;
 
         String currentPath = System.getProperty("user.dir");
         //String javaClientPath = "src/test/java/io/appium/java_client/";

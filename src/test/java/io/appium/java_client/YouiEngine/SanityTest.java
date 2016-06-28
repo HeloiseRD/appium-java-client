@@ -185,10 +185,15 @@ public class SanityTest extends AppiumTest {
         utils.delayInSeconds(2);
     }
 
-    // TODO US-3491 - backgrounding our app closes the socket server
     // Confirm we can send the app to the background for a short time.
     @org.junit.Test
     public void runInBackgroundTest() throws Exception {
+        // TODO US-3491 - backgrounding our app closes the socket server
+        if (driver.appPlatform.equals(driver.ANDROID))
+        {
+            Assert.fail("US-3491 - backgrounding our app closes the socket server on Android.");
+        }
+
         driver.runAppInBackground(10);
         try {
             WebElement pushButton = driver.findElement(By.name("PushButton"));
@@ -539,8 +544,126 @@ public class SanityTest extends AppiumTest {
         }
     }
 
+    // TODO update these to reflect the correct error
+    @org.junit.Test
+    public void findElementByXPathTest() throws Exception {
+        WebElement textEdit;
+        try {
+            textEdit = driver.findElement(By.xpath(".//CYISceneView//CYITextEditView"));
+        } catch (Exception ex) {
+            OutputException(ex, "Expected exception was thrown.");
+            return;
+        }
+        //shouldn't get this far.
+        Assert.fail("Did not throw the expected exception.");
+    }
+
+    @org.junit.Test
+    public void findElementsByXPathTest() throws Exception {
+        List<WebElement> textEdits;
+        try {
+            textEdits = driver.findElements(By.xpath(".//CYISceneView//CYITextEditView"));
+        } catch (Exception ex) {
+            OutputException(ex, "Expected exception was thrown.");
+            return;
+        }
+        //shouldn't get this far.
+        Assert.fail("Did not throw the expected exception.");
+    }
+
+    @org.junit.Test
+    public void findElementByCssSelectorTest() throws Exception {
+        WebElement textEdit;
+        try {
+            textEdit = driver.findElement(By.cssSelector(".something"));
+        } catch (Exception ex) {
+            OutputException(ex, "Expected exception was thrown.");
+            return;
+        }
+        //shouldn't get this far.
+        Assert.fail("Did not throw the expected exception.");
+    }
+
+    @org.junit.Test
+    public void findElementsByCssSelectorTest() throws Exception {
+        List<WebElement> textEdits;
+        try {
+            textEdits = driver.findElements(By.cssSelector(".something"));
+        } catch (Exception ex) {
+            OutputException(ex, "Expected exception was thrown.");
+            return;
+        }
+        //shouldn't get this far.
+        Assert.fail("Did not throw the expected exception.");
+    }
+
+    @org.junit.Test
+    public void findElementByLinkTextTest() throws Exception {
+        WebElement textEdit;
+        try {
+            textEdit = driver.findElement(By.linkText("Link"));
+        } catch (Exception ex) {
+            OutputException(ex, "Expected exception was thrown.");
+            return;
+        }
+        //shouldn't get this far.
+        Assert.fail("Did not throw the expected exception.");
+    }
+
+    @org.junit.Test
+    public void findElementsByLinkTextTest() throws Exception {
+        List<WebElement> textEdits;
+        try {
+            textEdits = driver.findElements(By.linkText("Link"));
+        } catch (Exception ex) {
+            OutputException(ex, "Expected exception was thrown.");
+            return;
+        }
+        //shouldn't get this far.
+        Assert.fail("Did not throw the expected exception.");
+    }
+
+    @org.junit.Test
+    public void findElementByPartialLinkTextTest() throws Exception {
+        WebElement textEdit;
+        try {
+            textEdit = driver.findElement(By.partialLinkText("Link"));
+        } catch (Exception ex) {
+            OutputException(ex, "Expected exception was thrown.");
+            return;
+        }
+        //shouldn't get this far.
+        Assert.fail("Did not throw the expected exception.");
+    }
+
+    @org.junit.Test
+    public void findElementsByPartialLinkTextTest() throws Exception {
+        List<WebElement> textEdits;
+        try {
+            textEdits = driver.findElements(By.partialLinkText("Link"));
+        } catch (Exception ex) {
+            OutputException(ex, "Expected exception was thrown.");
+            return;
+        }
+        //shouldn't get this far.
+        Assert.fail("Did not throw the expected exception.");
+    }
+
+    private void OutputException(Exception ex, String message) {
+        System.out.println("\n" + message + "\nClass: " + ex.getClass() + "\nMessage: "
+                + ex.getMessage() + "\nCause: " + ex.getCause() + "\nStackTrace: "
+                + ex.getStackTrace());
+    }
 
     /* TODO coming soon....
+    @org.junit.Test
+    public void findElementByTagNameTest() throws Exception {
+    }
+
+    @org.junit.Test
+    public void findElementsByTagNameTest() throws Exception {
+    }
+
     @org.junit.Test
     public void isSelectedTest() throws Exception {
         WebElement toggleButton = driver.findElement(By.className("CYIToggleButton"));
@@ -585,25 +708,5 @@ public class SanityTest extends AppiumTest {
         System.out.println("\nLogs: " + logs.toString());
     } */
 
-    // TODO update these to reflect the correct error
-    /* @org.junit.Test
-    public void findElementByXPathTest() throws Exception {
-    } */
-
-    /* @org.junit.Test
-    public void findElementByCssSelectorTest() throws Exception {
-    } */
-
-    /* @org.junit.Test
-    public void findElementByTagNameTest() throws Exception {
-    } */
-
-    /* @org.junit.Test
-    public void findElementByLinkTextTest() throws Exception {
-    } */
-
-    /* @org.junit.Test
-    public void findElementByPartialLinkTextTest() throws Exception {
-    } */
 }
 
