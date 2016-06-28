@@ -6,12 +6,6 @@ import org.openqa.selenium.remote.CapabilityType;
  * The list of YouiEngine-specific capabilities.
  */
 public interface YouiEngineCapabilityType extends CapabilityType {
-
-    /**
-     * Platform the app was developed for: iOS, Android.
-     */
-    String APP_PLATFORM = "youiEngineAppPlatform";
-
     /**
      * IP address of the app to execute commands against.
      */

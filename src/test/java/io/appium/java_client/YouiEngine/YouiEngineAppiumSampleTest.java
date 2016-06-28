@@ -82,14 +82,13 @@ public class YouiEngineAppiumSampleTest {
     // Adjust the capabilities you wish to use in here.
     private void setupCaps(String appPath) {
         capabilities = new DesiredCapabilities();
-
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "YouiEngine");
         capabilities.setCapability(MobileCapabilityType.APP, appPath);
+        capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "YouiEngine");
 
         if (isAndroid) {
-            capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "android");
             // The lines below can be modified to target a device or an AVD. Update accordingly.
             capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android");
+            capabilities.setCapability(MobileCapabilityType.PLATFORM, "android");
             //capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "devicename");
             capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
             //capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "ip.add.res.ss");
@@ -97,8 +96,8 @@ public class YouiEngineAppiumSampleTest {
 
         } else {
             capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 6s Plus");
+            capabilities.setCapability(MobileCapabilityType.PLATFORM, "iOS");
             capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
-            capabilities.setCapability(YouiEngineCapabilityType.APP_PLATFORM, "iOS");
         }
     }
 
