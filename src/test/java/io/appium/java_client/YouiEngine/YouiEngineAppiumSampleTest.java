@@ -4,6 +4,7 @@ import io.appium.java_client.YouiEngine.util.TestUtility;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.YouiEngineCapabilityType;
+import io.appium.java_client.TouchAction;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Assert;
@@ -14,16 +15,17 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.not;
@@ -88,16 +90,17 @@ public class YouiEngineAppiumSampleTest {
         if (isAndroid) {
             // The lines below can be modified to target a device or an AVD. Update accordingly.
             capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android");
-            capabilities.setCapability(MobileCapabilityType.PLATFORM, "android");
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
             //capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "devicename");
             capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
             //capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "ip.add.res.ss");
             capabilities.setCapability(AndroidMobileCapabilityType.AVD, "nexus5intel");
 
         } else {
-            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 6s Plus");
-            capabilities.setCapability(MobileCapabilityType.PLATFORM, "iOS");
-            capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
+            //capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 6 Plus");
+            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "localhost");
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "NoProxy");
+            //capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
         }
     }
 
@@ -116,10 +119,12 @@ public class YouiEngineAppiumSampleTest {
     @Before
     public void setUp() throws Exception {
         // Toggle this to switch between Android and iOS
-        isAndroid = true;
+        isAndroid = false;
 
         String currentPath = System.getProperty("user.dir");
-        String javaClientPath = "java/io/appium/java_client/";
+        // String javaClientPath = "src/test/java/io/appium/java_client/";
+        String javaClientPath = "../uswish/samples/YouiEngineAppiumSample/build/ios/Debug-iphonesimulator/";
+
         String appName = "YouiEngineAppiumSample";
         String fullAppName = isAndroid ? appName + "-debug.apk" : appName + ".app.zip";
 
@@ -267,5 +272,82 @@ public class YouiEngineAppiumSampleTest {
             }
         }
         Assert.assertTrue(allFound);
+    }
+
+    /* This test utilizes the TouchAction methods and tests the Youi Engine implementation.
+     *  */
+    @org.junit.Test
+    public void LocationTest() throws Exception {
+
+        Point elementLocation;
+
+        WebElement textEdit;
+        textEdit = driver.findElement(By.name("TextEdit"));
+
+        elementLocation = textEdit.getLocation();
+        Assert.assertEquals(elementLocation.x, 55);
+        Assert.assertEquals(elementLocation.y, 245);
+
+        WebElement passwordEdit;
+        passwordEdit = driver.findElement(By.name("PasswordEdit"));
+
+        elementLocation = passwordEdit.getLocation();
+        Assert.assertEquals(elementLocation.x, 55);
+        Assert.assertEquals(elementLocation.y, 372);
+
+        WebElement toggleButton;
+        toggleButton = driver.findElement(By.name("ToggleButton"));
+
+        elementLocation = toggleButton.getLocation();
+        Assert.assertEquals(elementLocation.x, 61);
+        Assert.assertEquals(elementLocation.y, 811);
+    }
+
+    /* This test utilizes the TouchAction methods and tests the Youi Engine implementation for taps and presses.
+     * */
+    @org.junit.Test
+    public void pressActionTest() throws Exception {
+
+        final String toggleOn = "Toggled ON";
+        final String toggleOff = "Toggled OFF";
+
+        // Test Press and Release which is really a Tap
+
+        WebElement toggleButton;
+        toggleButton = driver.findElement(By.name("ToggleButton"));
+
+        String captionFound = toggleButton.findElement(By.name("Text")).getText();
+        Assert.assertEquals(toggleOff, captionFound);
+
+        // Test press(WebElement) and release()
+        TouchAction downUpElement = new TouchAction(driver).press(toggleButton).release();
+        downUpElement.perform();
+
+        captionFound = toggleButton.findElement(By.name("Text")).getText();
+        Assert.assertEquals(toggleOn, captionFound);
+
+        // Test press(x, y) and release()
+
+        Point toggleLocation = toggleButton.getLocation(); // num args 0 - error
+        TouchAction downUpXY = new TouchAction(driver).press(toggleLocation.x, toggleLocation.y).release();
+        downUpXY.perform();
+
+        captionFound = toggleButton.findElement(By.name("Text")).getText();
+        Assert.assertEquals(toggleOff, captionFound);
+
+        // Test press(WebElement, x, y) and release()
+
+        TouchAction downUpWEXY = new TouchAction(driver).press(toggleButton, 10, 10).release();
+        downUpWEXY.perform();
+
+        captionFound = toggleButton.findElement(By.name("Text")).getText();
+        Assert.assertEquals(toggleOn, captionFound);
+    }
+
+    /* This test utilizes the TouchAction methods for moving, swiping and flicking and tests the Youi Engine implementation.
+     * */
+    @org.junit.Test
+    public void moveActionTest() throws Exception {
+        // Test
     }
 }
