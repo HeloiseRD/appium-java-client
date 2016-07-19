@@ -14,7 +14,9 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -99,7 +101,8 @@ public class YouiEngineAppiumSampleTest {
 
         } else {
             capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 6s Plus");
-            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
+            //capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "NoProxy");
             capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
         }
     }
@@ -121,7 +124,7 @@ public class YouiEngineAppiumSampleTest {
     @Before
     public void setUp() throws Exception {
         // Toggle this to switch between Android and iOS
-        isAndroid = true;
+        isAndroid = false;
 
         String currentPath = System.getProperty("user.dir");
         String javaClientPath = "java/io/appium/java_client/";
@@ -408,5 +411,69 @@ public class YouiEngineAppiumSampleTest {
         toggleElement.clear();
         utils.delayInSeconds(2);
         Assert.assertFalse(toggleElement.isSelected());
+    }
+
+    /* This test utilizes the TouchAction methods and tests the Youi Engine implementation.
+      *  */
+    @org.junit.Test
+    public void LocationTest() {
+
+        Point elementLocation;
+
+        WebElement textEdit;
+        textEdit = driver.findElement(By.name("TextEdit"));
+
+        elementLocation = textEdit.getLocation();
+        Assert.assertEquals(elementLocation.x, 55);
+        Assert.assertEquals(elementLocation.y, 245);
+
+        WebElement passwordEdit;
+        passwordEdit = driver.findElement(By.name("PasswordEdit"));
+
+        elementLocation = passwordEdit.getLocation();
+        Assert.assertEquals(elementLocation.x, 49);
+        Assert.assertEquals(elementLocation.y, 399);
+
+        WebElement toggleButton;
+        toggleButton = driver.findElement(By.name("ToggleButton"));
+        elementLocation = toggleButton.getLocation();
+        Assert.assertEquals(elementLocation.x, 76);
+        Assert.assertEquals(elementLocation.y, 718);
+
+        // Test offscreen button this should give the proper coordinates even if it is off-screen
+        WebElement offScreenButton;
+        offScreenButton = driver.findElement(By.name("OffScreenButton"));
+        elementLocation = offScreenButton.getLocation();
+        Assert.assertEquals(elementLocation.x, -448);
+        Assert.assertEquals(elementLocation.y, 781);
+
+        // When we have tap implemented we can add a test to get the location of an element and tap on it to round-trip the data
+        // and rely less on absolute values
+    }
+
+
+    @org.junit.Test
+    public void SizeTest() throws Exception {
+
+        Dimension elementSize;
+
+        WebElement textEdit;
+        textEdit = driver.findElement(By.name("TextEdit"));
+        elementSize = textEdit.getSize();
+        Assert.assertEquals(elementSize.width, 525);
+        Assert.assertEquals(elementSize.height, 90);
+
+        WebElement passwordEdit;
+        passwordEdit = driver.findElement(By.name("PasswordEdit"));
+        elementSize = passwordEdit.getSize();
+        Assert.assertEquals(elementSize.width, 525);
+        Assert.assertEquals(elementSize.height, 90);
+
+        // a hidden and partly hidden button will return the full size
+        WebElement toggleButton;
+        toggleButton = driver.findElement(By.name("PartHiddenButton"));
+        elementSize = toggleButton.getSize();
+        Assert.assertEquals(elementSize.width, 513);
+        Assert.assertEquals(elementSize.height, 99);
     }
 }
