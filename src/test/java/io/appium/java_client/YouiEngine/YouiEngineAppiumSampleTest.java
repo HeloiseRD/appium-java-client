@@ -4,6 +4,7 @@ import io.appium.java_client.YouiEngine.util.TestUtility;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.YouiEngineCapabilityType;
+import io.appium.java_client.TouchAction;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Assert;
@@ -15,6 +16,7 @@ import org.junit.runner.Description;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -98,9 +100,10 @@ public class YouiEngineAppiumSampleTest {
             capabilities.setCapability(AndroidMobileCapabilityType.AVD, "nexus5intel");
 
         } else {
-            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 6s Plus");
-            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
-            capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "localhost");
+            //capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "iPhone 6 Plus");
+            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "localhost");
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "NoProxy");
+            //capabilities.setCapability(YouiEngineCapabilityType.APP_ADDRESS, "192.168.24.23");
         }
     }
 
@@ -121,7 +124,7 @@ public class YouiEngineAppiumSampleTest {
     @Before
     public void setUp() throws Exception {
         // Toggle this to switch between Android and iOS
-        isAndroid = true;
+        isAndroid = false;
 
         String currentPath = System.getProperty("user.dir");
         String javaClientPath = "java/io/appium/java_client/";
@@ -331,82 +334,146 @@ public class YouiEngineAppiumSampleTest {
         Assert.assertTrue(allFound);
     }
 
-    /* Display tests 
-    * */
+    /* Display tests
+    /* This test utilizes the TouchAction methods and tests the Youi Engine implementation.
+     *  */
     @org.junit.Test
-    public void testVisibility() throws Exception {
-        boolean displayed = false;
+    public void LocationTest() throws Exception {
 
-        // We will check if it is hidden, opacity is 0 and if it is reachable from the root
+        Point elementLocation;
 
-        // Test fully visible button - should be true 
-        WebElement pushButton;
-        pushButton = driver.findElement(By.name("PushButton"));
-        displayed = pushButton.isDisplayed();
-        Assert.assertTrue(displayed);
+        WebElement textEdit;
+        textEdit = driver.findElement(By.name("TextEdit"));
 
-        // Test fully hidden button - visibility is off - shouldn't even be able to find the button and it won't show in the page source  
-        displayed = true;
-        try {
-            WebElement hiddenButton = driver.findElement(By.name("HiddenButton"));
-        } catch (NoSuchElementException nsee) {
-            // assert we get here - can't find element 
-            System.out.println("\tDid not find: HiddenButton");
-            displayed = false;
-        }
-        Assert.assertFalse(displayed);
+        elementLocation = textEdit.getLocation();
+        Assert.assertEquals(elementLocation.x, 55);
+        Assert.assertEquals(elementLocation.y, 245);
 
-        // Test button partially hidden by another object - should be true 
+        WebElement passwordEdit;
+        passwordEdit = driver.findElement(By.name("PasswordEdit"));
 
-        WebElement partHiddenButton;
-        partHiddenButton = driver.findElement(By.name("PartHiddenButton"));
-        displayed = partHiddenButton.isDisplayed();
-        Assert.assertTrue(displayed);
+        elementLocation = passwordEdit.getLocation();
+        Assert.assertEquals(elementLocation.x, 55);
+        Assert.assertEquals(elementLocation.y, 372);
 
-        // Test button fully hidden behind another object - this will be true as we don't cover this situation
+        WebElement toggleButton;
+        toggleButton = driver.findElement(By.name("ToggleButton"));
 
-        WebElement fullyHiddenButton;
-        fullyHiddenButton = driver.findElement(By.name("FullyHiddenButton"));
-        displayed = fullyHiddenButton.isDisplayed();
-        Assert.assertTrue(displayed);
-
-        // Test opaque button - should be false
-
-        WebElement opaqueButton;
-        opaqueButton = driver.findElement(By.name("OpaqueButton"));
-        displayed = opaqueButton.isDisplayed();
-        Assert.assertFalse(displayed);
+        elementLocation = toggleButton.getLocation();
+        Assert.assertEquals(elementLocation.x, 61);
+        Assert.assertEquals(elementLocation.y, 811);
     }
 
+    /* This test utilizes the TouchAction methods and tests the Youi Engine implementation for taps and presses.
+     * */
     @org.junit.Test
-    public void clearNodeTest() throws Exception {
+    public void pressActionTest() throws Exception {
 
-        WebElement textElement = driver.findElement(By.name("TextEdit"));
-        textElement.sendKeys("Test Text");
-        utils.delayInSeconds(2);
-        textElement.clear();
-        utils.delayInSeconds(2);
-        // CYITextEditViews revert to node name when they are cleared
-        Assert.assertEquals("TextEdit", textElement.findElement(By.name("Text")).getText());
+        final String toggleOn = "Toggled ON";
+        final String toggleOff = "Toggled OFF";
 
-        WebElement passwordElement = driver.findElement(By.name("PasswordEdit"));
-        passwordElement.sendKeys(("B@DP@55W0rD"));
-        utils.delayInSeconds(2);
-        passwordElement.clear();
-        utils.delayInSeconds(2);
-        // CYITextEditViews revert to node name when they are cleared
-        Assert.assertEquals("PasswordEdit", passwordElement.findElement(By.name("Text")).getText());
+        // Test Press and Release which is really a Tap
 
-        WebElement toggleElement = driver.findElement(By.name("ToggleButton"));
+        WebElement toggleButton;
+        toggleButton = driver.findElement(By.name("ToggleButton"));
 
-        toggleElement.click();
-        utils.delayInSeconds(2);
+        String captionFound = toggleButton.findElement(By.name("Text")).getText();
+        Assert.assertEquals(toggleOff, captionFound);
 
-        // make sure that clicking the toggle toggled it on.
-        Assert.assertTrue(toggleElement.isSelected());
+        // Test press(WebElement) and release()
+        TouchAction downUpElement = new TouchAction(driver).press(toggleButton).release();
+        downUpElement.perform();
 
-        toggleElement.clear();
-        utils.delayInSeconds(2);
-        Assert.assertFalse(toggleElement.isSelected());
+        captionFound = toggleButton.findElement(By.name("Text")).getText();
+        Assert.assertEquals(toggleOn, captionFound);
+
+        // Test press(x, y) and release()
+        Point toggleLocation = toggleButton.getLocation(); // num args 0 - error
+        TouchAction downUpXY = new TouchAction(driver).press(toggleLocation.x + 10, toggleLocation.y + 10).release();
+        downUpXY.perform();
+
+        captionFound = toggleButton.findElement(By.name("Text")).getText();
+        Assert.assertEquals(toggleOff, captionFound);
+
+        // Test press(WebElement, x, y) and release()
+        TouchAction downUpWEXY = new TouchAction(driver).press(toggleButton, 10, 10).release();
+        downUpWEXY.perform();
+
+        captionFound = toggleButton.findElement(By.name("Text")).getText();
+        Assert.assertEquals(toggleOn, captionFound);
+    }
+
+    /* This test utilizes the TouchAction methods for moving, swiping and flicking and tests the Youi Engine implementation.
+     * */
+    @org.junit.Test
+    public void moveActionTest() throws Exception {
+        // Test scrolling the list view
+
+        WebElement listView;
+        listView = driver.findElement(By.name("MyListView"));
+
+        List listViewItems = driver.findElementsByClassName("MyListItemView");
+
+        if (listViewItems.size() != 0) {
+            WebElement listViewItem = (WebElement) listViewItems.get(2);
+
+            // Test press(WebElement), move and release() to scroll list view (doesn't work on device, likely needs to be center or something)
+            TouchAction scrollListItem1 = new TouchAction(driver).press(listViewItem).moveTo(-100, 0).release();
+            scrollListItem1.perform();
+
+            // need 2 other APIS
+            Point location = listViewItem.getLocation();
+            TouchAction scrollListItem2 = new TouchAction(driver).press(location.x + 10, location.y + 10).moveTo(-100, 0).release();
+            scrollListItem2.perform();
+
+            TouchAction scrollListItem3 = new TouchAction(driver).press(listViewItem, 10, 10).moveTo(-100, 0).release();
+            scrollListItem3.perform();
+        }
+    }
+
+    /* This test ...
+     * */
+    @org.junit.Test
+    public void longPressActionTest() throws Exception {
+
+
+        // longpress on element
+        WebElement button;
+        button = driver.findElement(By.name("ToggleButton"));
+        TouchAction longPress = new TouchAction(driver).longPress(button).release();
+        longPress.perform();
+
+        // have to wait here!!!
+        //driverWait.wait(2000);
+
+        String captionFound = driver.findElement(By.name("PartHiddenButton")).getText();
+        Assert.assertEquals("Long Pressed", captionFound);
+
+        // longpress on x,y
+
+        Point location = button.getLocation();
+        driver.findElement(By.name("PartHiddenButton")).clear(); // clar Long Pressed caption
+
+        longPress = new TouchAction(driver).longPress(location.x + 10, location.y + 10).release();
+        longPress.perform();
+
+        // have to wait here!!!
+        //driverWait.wait(2000);
+
+        captionFound = driver.findElement(By.name("PartHiddenButton")).getText();
+        Assert.assertEquals("Long Pressed", captionFound);
+    }
+
+    /* This test ...
+     * */
+        @org.junit.Test
+    public void longPressMoveTest() throws Exception {
+        // have the sample do something on long press move that we can measure
+        // longpress + context menu + move
+        // WebElement contextMenu, menuItem;
+        //contextMenu = driver.findElement(By.name("ContextMenu"));
+        //TouchAction contextMenu = new TouchAction(driver).longPress(toggleButton).moveTo(menuItem).release();
+
+
     }
 }
