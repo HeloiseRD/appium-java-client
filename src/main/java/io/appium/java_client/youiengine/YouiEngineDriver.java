@@ -17,6 +17,7 @@
 package io.appium.java_client.youiengine;
 
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.TouchAction;
 import io.appium.java_client.youiengine.internal.JsonToYouiEngineElementConverter;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebElement;
@@ -33,6 +34,9 @@ public class YouiEngineDriver<T extends WebElement> extends AppiumDriver<T> {
 
     @Override
     public void swipe(int startx, int starty, int endx, int endy, int duration) {
-        super.doSwipe(startx, starty, endx, endy, duration);
+        // YouiEngine does not use duration
+        TouchAction swipeAction = new TouchAction(this).press(startx, starty).moveTo(endx, endy)
+                .release();
+        swipeAction.perform();
     }
 }
